@@ -1,0 +1,21 @@
+﻿export const appRoutes = {
+  login: "/login",
+  dashboard: "/dashboard",
+  produtos: "/produtos",
+  produtoNovo: "/produtos/novo",
+  produtoDetalhe: "/produtos/:id",
+  produtoEditar: "/produtos/:id/editar",
+  estoque: "/estoque",
+  estoqueMovimentar: "/estoque/movimentar",
+  clientes: "/clientes",
+  clienteNovo: "/clientes/novo",
+  clienteDetalhe: "/clientes/:id",
+  clienteEditar: "/clientes/:id/editar",
+  vendas: "/vendas",
+  vendaNova: "/vendas/nova",
+  vendaDetalhe: "/vendas/:id",
+  relatorios: "/relatorios",
+  configuracoes: "/configuracoes",
+  caixaAbrir: "/caixa/abrir",
+  caixaFechar: "/caixa/fechar"
+} as const;
