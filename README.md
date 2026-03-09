@@ -2,7 +2,7 @@
 
 Aplicativo desktop para gerenciamento de loja, construido com Tauri + React + TypeScript, com persistencia local em SQLite.
 
-Este projeto foi estruturado como base de sistema real (MVP funcional), com foco em:
+Este projeto foi estruturado como base de sistema real, com foco em:
 - arquitetura limpa por camadas
 - consistencia entre dominio, banco e UI
 - fluxos de operacao de loja (estoque, caixa e vendas)
