@@ -18,7 +18,7 @@
 
 ---
 
-## ✨ O que o sistema faz
+## O que o sistema faz
 
 | Módulo | Funcionalidades |
 |---|---|
@@ -32,7 +32,7 @@
 
 ---
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 O projeto segue arquitetura em camadas, com separação clara entre domínio, persistência e interface:
 
@@ -56,7 +56,7 @@ src-tauri/
 
 ---
 
-## 🔒 Regras de negócio principais
+## Regras de negócio principais
 
 - Venda só finaliza com caixa aberto pelo usuário atual
 - Finalizar venda baixa estoque e registra movimentos automaticamente
@@ -66,7 +66,7 @@ src-tauri/
 
 ---
 
-## 🛠️ Stack completa
+## Stack completa
 
 **Frontend:** React 18 · TypeScript · Vite · Tailwind CSS · shadcn/ui · React Router · TanStack Query · Zustand · React Hook Form · Zod
 
@@ -76,7 +76,7 @@ src-tauri/
 
 ---
 
-## 🚀 Como rodar localmente
+## Como rodar localmente
 
 **Pré-requisitos:** Node.js 20+, npm, Rust toolchain estável, dependências nativas Tauri (Windows: WebView2 + Build Tools)
 
@@ -99,7 +99,7 @@ senha: admin123
 
 ---
 
-## 📁 Banco de dados
+## Banco de dados
 
 Schema com 10 tabelas criado e migrado automaticamente na inicialização:
 
