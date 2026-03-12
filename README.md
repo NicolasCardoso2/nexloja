@@ -1,162 +1,114 @@
-# NEXLOJA
+<div align="center">
 
-Aplicativo desktop para gerenciamento de loja, construido com Tauri + React + TypeScript, com persistencia local em SQLite.
+# NexLoja
 
-Este projeto foi estruturado como base de sistema real, com foco em:
-- arquitetura limpa por camadas
-- consistencia entre dominio, banco e UI
-- fluxos de operacao de loja (estoque, caixa e vendas)
+**Sistema completo de gerenciamento de loja — desktop, offline, produção-ready.**
 
-## Visao geral da V1
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React_18-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![Tauri](https://img.shields.io/badge/Tauri_2-FFC131?style=flat-square&logo=tauri&logoColor=black)](https://tauri.app/)
+[![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white)](https://sqlite.org/)
 
-Modulos cobertos:
-- autenticacao com perfis `ADMIN` e `VENDEDOR`
-- dashboard com indicadores operacionais
-- produtos (CRUD + inativacao logica)
-- clientes (CRUD + inativacao logica)
-- estoque (consulta + movimentacoes + historico)
-- caixa (abertura, sessao atual, fechamento, movimentos)
-- vendas (nova venda, historico, detalhe, cancelamento)
-- relatorios (vendas por periodo, mais vendidos, estoque atual, estoque baixo)
-- configuracoes da loja
+> Aplicativo desktop para gerenciamento completo de loja física — estoque, caixa, vendas e relatórios — construído com Tauri + React + TypeScript e persistência local em SQLite.
 
-## Stack
+<!-- 💡 Adicione um screenshot aqui: -->
+<!-- ![NexLoja Dashboard](./docs/screenshot-dashboard.png) -->
 
-- Tauri 2
-- React 18
-- TypeScript
-- Vite
-- Tailwind CSS
-- shadcn/ui
-- React Router
-- TanStack Query
-- Zustand
-- React Hook Form
-- Zod
-- SQLite (via `rusqlite` no backend Rust)
+</div>
 
-## Arquitetura de pastas
+---
 
-```txt
+## ✨ O que o sistema faz
+
+| Módulo | Funcionalidades |
+|---|---|
+| 🔐 **Autenticação** | Perfis ADMIN e VENDEDOR com senhas em Argon2 |
+| 📊 **Dashboard** | Indicadores operacionais em tempo real |
+| 📦 **Produtos** | CRUD completo + inativação lógica + controle de estoque |
+| 👥 **Clientes** | Cadastro completo com histórico de compras |
+| 💰 **Caixa** | Abertura, sessão ativa, fechamento e movimentos |
+| 🛒 **Vendas** | Nova venda, histórico, detalhes e cancelamento |
+| 📈 **Relatórios** | Vendas por período, mais vendidos, estoque atual e crítico |
+
+---
+
+## 🏗️ Arquitetura
+
+O projeto segue arquitetura em camadas, com separação clara entre domínio, persistência e interface:
+
+```
 src/
   app/          # router, providers, layouts, stores globais
   pages/        # telas
-  features/     # modulo por dominio (componentes, services, validators)
+  features/     # módulo por domínio (componentes, services, validators)
   data/         # db, repositories, mappers
-  domain/       # entidades, enums, regras de negocio puras
-  shared/       # componentes e utilitarios reutilizaveis
-  styles/
+  domain/       # entidades, enums, regras de negócio puras
+  shared/       # componentes e utilitários reutilizáveis
 
 src-tauri/
   src/main.rs   # comandos Tauri, schema SQLite, seed e regras transacionais
 ```
 
-## Banco de dados (SQLite)
+**Princípios aplicados:**
+- Lógica pesada fora das páginas — concentrada em `repositories` e `domain`
+- Tipagem forte com TypeScript + validação de formulários com Zod
+- Regras críticas de negócio executadas no backend Rust (via Tauri)
 
-Tabelas da V1:
-- `usuarios`
-- `configuracao_loja`
-- `categorias`
-- `produtos`
-- `clientes`
-- `caixa_sessoes`
-- `vendas`
-- `itens_venda`
-- `movimentacoes_estoque`
-- `caixa_movimentos`
+---
 
-O backend garante criacao/atualizacao de estrutura e seed inicial na inicializacao da aplicacao.
+## 🔒 Regras de negócio principais
 
-## Seed inicial
+- Venda só finaliza com caixa aberto pelo usuário atual
+- Finalizar venda baixa estoque e registra movimentos automaticamente
+- Cancelamento de venda devolve estoque e exclui do faturamento
+- Controle de sessão de caixa por usuário (sem sessões duplicadas)
+- Produto com código único; valores monetários e estoque nunca negativos
 
-Credencial padrao:
-- login: `admin`
-- senha: `admin123`
+---
 
-Tambem sao inseridos dados iniciais de:
-- configuracao da loja
-- categorias base
+## 🛠️ Stack completa
 
-## Regras de negocio principais
+**Frontend:** React 18 · TypeScript · Vite · Tailwind CSS · shadcn/ui · React Router · TanStack Query · Zustand · React Hook Form · Zod
 
-- produto com codigo unico
-- valores monetarios e estoque nao negativos
-- venda exige caixa aberto para usuario atual
-- venda nao finaliza sem item e sem estoque suficiente
-- finalizar venda baixa estoque e registra movimentos (estoque + caixa)
-- cancelar venda devolve estoque e marca venda como `CANCELADA`
-- vendas canceladas nao entram em faturamento
-- controle de sessao de caixa por usuario (nao permite duas sessoes abertas)
-- senhas armazenadas com hash (Argon2)
+**Backend (desktop):** Tauri 2 · Rust · rusqlite · Argon2
 
-## Pre-requisitos
+**Banco de dados:** SQLite (10 tabelas — usuários, produtos, clientes, vendas, estoque, caixa e mais)
 
-Para rodar localmente:
-- Node.js 20+ (recomendado)
-- npm
-- Rust toolchain estavel
-- Dependencias nativas do Tauri para Windows (WebView2/Build Tools)
+---
 
-## Como executar
+## 🚀 Como rodar localmente
 
-1. Instalar dependencias
+**Pré-requisitos:** Node.js 20+, npm, Rust toolchain estável, dependências nativas Tauri (Windows: WebView2 + Build Tools)
 
 ```bash
+# Instalar dependências
 npm install
-```
 
-2. Rodar frontend web (desenvolvimento)
-
-```bash
-npm run dev
-```
-
-3. Rodar app desktop Tauri (desenvolvimento)
-
-```bash
+# Rodar em modo desenvolvimento (desktop)
 npm run tauri dev
-```
 
-## Build
-
-Build web:
-
-```bash
-npm run build
-```
-
-Build desktop:
-
-```bash
+# Build para produção
 npm run tauri build
 ```
 
-## Scripts disponiveis
+**Credencial padrão do seed:**
+```
+login: admin
+senha: admin123
+```
 
-- `npm run dev` -> inicia Vite
-- `npm run build` -> typecheck + build web
-- `npm run preview` -> preview do build web
-- `npm run tauri <cmd>` -> comandos Tauri (`dev`, `build`, etc.)
+---
 
-## Rotas principais
+## 📁 Banco de dados
 
-- `/login`
-- `/dashboard`
-- `/produtos`
-- `/estoque`
-- `/clientes`
-- `/vendas`
-- `/relatorios`
-- `/configuracoes`
-- `/caixa/abrir`
-- `/caixa/fechar`
+Schema com 10 tabelas criado e migrado automaticamente na inicialização:
 
-## Qualidade e evolucao
+`usuarios` · `configuracao_loja` · `categorias` · `produtos` · `clientes` · `caixa_sessoes` · `vendas` · `itens_venda` · `movimentacoes_estoque` · `caixa_movimentos`
 
-Diretrizes desta base:
-- evitar logica pesada nas paginas
-- concentrar persistencia em repositories
-- manter regras criticas no dominio/backend
-- preservar tipagem forte e validacao de formularios com Zod
+---
 
-Objetivo da V1: estabilidade operacional e base pronta para evolucao de novas features sem refatoracao estrutural.
+<div align="center">
+
+Feito por [Nicolas Cardoso](https://github.com/NicolasCardoso2) · [LinkedIn](https://www.linkedin.com/in/nicolas-cardoso-vilha-do-lago-2483b1322/)
+
+</div>
