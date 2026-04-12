@@ -1,4 +1,4 @@
-﻿import { tauriCommand } from "@/data/db/tauri-command";
+﻿import { obterSessaoCaixaAtual, abrirCaixa as apiAbrirCaixa, fecharCaixa as apiFecharCaixa, listarMovimentacoesCaixa } from "@/services/api";
 import {
   AbrirCaixaInput,
   CaixaMovimentoEntity,
@@ -6,84 +6,60 @@ import {
   FecharCaixaInput
 } from "@/domain/entities/caixa-sessao";
 
-type CaixaSessaoRaw = {
-  id: number;
-  usuarioId: number;
-  abertoEm: string;
-  fechadoEm?: string | null;
-  valorAbertura: number;
-  valorFechamento?: number | null;
-  valorSistema?: number | null;
-  diferenca?: number | null;
-  status: "ABERTO" | "FECHADO";
-  observacao?: string | null;
-  totalMovimentos: number;
-  valorFinalCalculado: number;
-};
-
-type CaixaMovimentoRaw = {
-  id: number;
-  tipo: CaixaMovimentoEntity["tipo"];
-  valor: number;
-  observacao?: string | null;
-  criadoEm: string;
-};
-
-function fromSessaoRaw(raw: CaixaSessaoRaw): CaixaSessaoEntity {
+function fromCaixaRaw(raw: any): CaixaSessaoEntity {
   return {
     id: raw.id,
-    usuario_id: raw.usuarioId,
-    aberto_em: raw.abertoEm,
-    fechado_em: raw.fechadoEm,
-    valor_abertura: raw.valorAbertura,
-    valor_fechamento: raw.valorFechamento,
-    valor_sistema: raw.valorSistema,
+    usuario_id: raw.usuario_id,
+    aberto_em: raw.aberto_em,
+    fechado_em: raw.fechado_em,
+    valor_abertura: raw.valor_abertura,
+    valor_fechamento: raw.valor_fechamento,
+    valor_sistema: raw.valor_sistema,
     diferenca: raw.diferenca,
     status: raw.status,
     observacao: raw.observacao,
-    total_movimentos: raw.totalMovimentos,
-    valor_final_calculado: raw.valorFinalCalculado
+    total_movimentos: raw.total_movimentos || 0,
+    valor_final_calculado: raw.valor_final_calculado || raw.valor_fechamento || 0
   };
 }
 
-function toAbrirPayload(input: AbrirCaixaInput) {
-  return {
-    usuarioId: input.usuario_id,
-    valorInicial: input.valor_inicial,
-    observacoes: input.observacoes
-  };
-}
-
-function toFecharPayload(input: FecharCaixaInput) {
-  return {
-    usuarioId: input.usuario_id,
-    valorFinalInformado: input.valor_final_informado,
-    observacoes: input.observacoes
-  };
-}
-
-export async function getCaixaAtualRepository(usuarioId: number): Promise<CaixaSessaoEntity | null> {
-  const raw = await tauriCommand<CaixaSessaoRaw | null>("get_current_cash_session", { usuarioId });
-  return raw ? fromSessaoRaw(raw) : null;
+export async function getCaixaAtualRepository(): Promise<CaixaSessaoEntity | null> {
+  try {
+    const raw = await obterSessaoCaixaAtual();
+    return raw ? fromCaixaRaw(raw) : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function abrirCaixaRepository(payload: AbrirCaixaInput): Promise<CaixaSessaoEntity> {
-  const raw = await tauriCommand<CaixaSessaoRaw>("open_cash_session", { payload: toAbrirPayload(payload) });
-  return fromSessaoRaw(raw);
+  const raw = await apiAbrirCaixa({
+    valor_abertura: payload.valor_inicial,
+    observacao: payload.observacoes
+  });
+  return fromCaixaRaw(raw);
 }
 
 export async function fecharCaixaRepository(payload: FecharCaixaInput): Promise<CaixaSessaoEntity> {
-  const raw = await tauriCommand<CaixaSessaoRaw>("close_cash_session", { payload: toFecharPayload(payload) });
-  return fromSessaoRaw(raw);
+  const raw = await apiFecharCaixa({
+    caixa_id: 1,
+    valor_fechamento: payload.valor_final_informado,
+    observacao: payload.observacoes
+  });
+  return fromCaixaRaw(raw);
 }
 
 export async function listMovimentosCaixaRepository(caixaSessaoId: number): Promise<CaixaMovimentoEntity[]> {
-  const raws = await tauriCommand<CaixaMovimentoRaw[]>("list_cash_movements", { caixaSessaoId });
-  return raws.map((raw) => ({
-    id: raw.id,
-    tipo: raw.tipo,
-    valor: raw.valor,
-    observacao: raw.observacao,
-    criado_em: raw.criadoEm
-  }));
+  try {
+    const raws = await listarMovimentacoesCaixa(caixaSessaoId);
+    return raws.map((raw: any) => ({
+      id: raw.id,
+      tipo: raw.tipo,
+      valor: raw.valor,
+      observacao: raw.observacao,
+      criado_em: raw.criado_em
+    }));
+  } catch {
+    return [];
+  }
 }

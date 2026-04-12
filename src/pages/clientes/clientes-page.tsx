@@ -1,12 +1,12 @@
-﻿import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+﻿import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { appRoutes } from "@/app/constants/routes";
 import { ClientesFilters } from "@/features/clientes/components/clientes-filters";
 import { ClientesTable } from "@/features/clientes/components/clientes-table";
 import { clienteQueryKeys } from "@/features/clientes/services/cliente-query-keys";
-import { deactivateClienteService, listClientesService } from "@/features/clientes/services/cliente-service";
-import { ClienteListState, serializeClienteFilters, toClienteFilters } from "@/features/clientes/types/cliente-filters";
+import { listClientesService } from "@/features/clientes/services/cliente-service";
+import { ClienteListState, serializeClienteFilters } from "@/features/clientes/types/cliente-filters";
 import { Button } from "@/shared/components/button";
 import { Card, CardContent } from "@/shared/components/card";
 import { PageTitle } from "@/shared/components/page-title";
@@ -22,30 +22,15 @@ function clientPath(routeTemplate: string, id: number): string {
 
 export function ClientesPage(): JSX.Element {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [filtersState, setFiltersState] = useState<ClienteListState>(defaultFilters);
-  const filters = useMemo(() => toClienteFilters(filtersState), [filtersState]);
+
+  const serializedFilters = useMemo(() => serializeClienteFilters(filtersState), [filtersState]);
 
   const clientesQuery = useQuery({
-    queryKey: clienteQueryKeys.list(serializeClienteFilters(filtersState)),
-    queryFn: () => listClientesService(filters)
+    queryKey: clienteQueryKeys.list(serializedFilters),
+    queryFn: () => listClientesService(),
+    staleTime: 5 * 60 * 1000
   });
-
-  const inativarMutation = useMutation({
-    mutationFn: deactivateClienteService,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: clienteQueryKeys.all });
-    }
-  });
-
-  function handleInativar(id: number): void {
-    const confirmed = window.confirm("Confirma a inativacao deste cliente?");
-    if (!confirmed) {
-      return;
-    }
-
-    inativarMutation.mutate(id);
-  }
 
   return (
     <section className="space-y-4">
@@ -78,10 +63,10 @@ export function ClientesPage(): JSX.Element {
       {clientesQuery.data && clientesQuery.data.length > 0 ? (
         <ClientesTable
           clientes={clientesQuery.data}
-          isInativando={inativarMutation.isPending}
+          isInativando={false}
           onVisualizar={(id) => navigate(clientPath(appRoutes.clienteDetalhe, id))}
           onEditar={(id) => navigate(clientPath(appRoutes.clienteEditar, id))}
-          onInativar={handleInativar}
+          onInativar={() => {}}
         />
       ) : null}
     </section>

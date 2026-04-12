@@ -6,8 +6,8 @@
 } from "@/data/repositories/caixa-repository";
 import { AbrirCaixaInput, FecharCaixaInput } from "@/domain/entities/caixa-sessao";
 
-export function getCaixaAtualService(usuarioId: number) {
-  return getCaixaAtualRepository(usuarioId);
+export function getCaixaAtualService() {
+  return getCaixaAtualRepository();
 }
 
 export function abrirCaixaService(payload: AbrirCaixaInput) {

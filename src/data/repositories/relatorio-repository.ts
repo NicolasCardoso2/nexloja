@@ -1,161 +1,114 @@
-﻿import { tauriCommand } from "@/data/db/tauri-command";
+import { listarRelatorioVendas, listarRelatorioProdutos } from "@/services/api";
 import {
-  RelatorioEstoqueBaixoFilters,
   RelatorioEstoqueBaixoItem,
-  RelatorioEstoqueFilters,
   RelatorioEstoqueItem,
-  RelatorioProdutosVendidosFilters,
   RelatorioProdutoMaisVendido,
-  RelatorioVendasFilters,
   RelatorioVendasResponse
 } from "@/domain/entities/relatorio";
 
-type RelatorioVendasRaw = {
-  itens: Array<{
-    numeroVenda: string;
-    criadoEm: string;
-    clienteNome?: string | null;
-    usuarioNome: string;
-    formaPagamento: string;
-    subtotal: number;
-    desconto: number;
-    total: number;
-    status: "FINALIZADA" | "CANCELADA";
-  }>;
-  resumo: {
-    quantidadeVendas: number;
-    totalVendidoFinalizadas: number;
-    totalDescontosFinalizadas: number;
-    ticketMedioFinalizadas: number;
-  };
-};
+function fromVendasRaw(itens: any[]): RelatorioVendasResponse {
+  const resumo = itens.reduce(
+    (acc, item) => ({
+      quantidade_vendas: acc.quantidade_vendas + 1,
+      total_vendido_finalizadas: acc.total_vendido_finalizadas + (item.total || 0),
+      total_descontos_finalizadas: acc.total_descontos_finalizadas,
+      ticket_medio_finalizadas: 0
+    }),
+    {
+      quantidade_vendas: 0,
+      total_vendido_finalizadas: 0,
+      total_descontos_finalizadas: 0,
+      ticket_medio_finalizadas: 0
+    }
+  );
 
-function toVendasFilters(filters: RelatorioVendasFilters) {
   return {
-    dataInicio: filters.dataInicio,
-    dataFim: filters.dataFim,
-    clienteId: filters.clienteId,
-    status: filters.status,
-    formaPagamento: filters.formaPagamento
-  };
-}
-
-function fromVendasRaw(raw: RelatorioVendasRaw): RelatorioVendasResponse {
-  return {
-    itens: raw.itens.map((item) => ({
-      numero_venda: item.numeroVenda,
-      criado_em: item.criadoEm,
-      cliente_nome: item.clienteNome,
-      usuario_nome: item.usuarioNome,
-      forma_pagamento: item.formaPagamento,
-      subtotal: item.subtotal,
-      desconto: item.desconto,
+    itens: itens.map((item) => ({
+      numero_venda: `VND-${item.id}`,
+      criado_em: item.criado_em,
+      cliente_nome: item.cliente_nome,
+      usuario_nome: "Usuário",
+      forma_pagamento: "LOJA_VIRTUAL",
+      subtotal: item.total,
+      desconto: 0,
       total: item.total,
       status: item.status
     })),
     resumo: {
-      quantidade_vendas: raw.resumo.quantidadeVendas,
-      total_vendido_finalizadas: raw.resumo.totalVendidoFinalizadas,
-      total_descontos_finalizadas: raw.resumo.totalDescontosFinalizadas,
-      ticket_medio_finalizadas: raw.resumo.ticketMedioFinalizadas
+      ...resumo,
+      ticket_medio_finalizadas:
+        resumo.quantidade_vendas > 0
+          ? resumo.total_vendido_finalizadas / resumo.quantidade_vendas
+          : 0
     }
   };
 }
 
-export async function reportVendasPorPeriodoRepository(
-  filters: RelatorioVendasFilters
-): Promise<RelatorioVendasResponse> {
-  const raw = await tauriCommand<RelatorioVendasRaw>("report_sales_by_period", { filters: toVendasFilters(filters) });
-  return fromVendasRaw(raw);
+export async function reportVendasPorPeriodoRepository(): Promise<RelatorioVendasResponse> {
+  try {
+    const raw = await listarRelatorioVendas();
+    return fromVendasRaw(raw);
+  } catch {
+    return {
+      itens: [],
+      resumo: {
+        quantidade_vendas: 0,
+        total_vendido_finalizadas: 0,
+        total_descontos_finalizadas: 0,
+        ticket_medio_finalizadas: 0
+      }
+    };
+  }
 }
 
-export async function reportProdutosMaisVendidosRepository(
-  filters: RelatorioProdutosVendidosFilters
-): Promise<RelatorioProdutoMaisVendido[]> {
-  const items = await tauriCommand<
-    Array<{
-      produtoNome: string;
-      produtoCodigo: string;
-      categoriaNome: string;
-      quantidadeVendida: number;
-      totalVendido: number;
-      precoMedioPraticado: number;
-    }>
-  >("report_top_selling_products", {
-    filters: {
-      dataInicio: filters.dataInicio,
-      dataFim: filters.dataFim,
-      categoriaId: filters.categoriaId
-    }
-  });
-
-  return items.map((item) => ({
-    produto_nome: item.produtoNome,
-    produto_codigo: item.produtoCodigo,
-    categoria_nome: item.categoriaNome,
-    quantidade_vendida: item.quantidadeVendida,
-    total_vendido: item.totalVendido,
-    preco_medio_praticado: item.precoMedioPraticado
-  }));
+export async function reportProdutosMaisVendidosRepository(): Promise<RelatorioProdutoMaisVendido[]> {
+  try {
+    const items = await listarRelatorioProdutos();
+    return items.map((item: any) => ({
+      produto_nome: item.nome,
+      produto_codigo: item.id.toString(),
+      categoria_nome: "",
+      quantidade_vendida: 0,
+      total_vendido: 0,
+      preco_medio_praticado: item.preco_venda
+    }));
+  } catch {
+    return [];
+  }
 }
 
-export async function reportEstoqueAtualRepository(filters: RelatorioEstoqueFilters): Promise<RelatorioEstoqueItem[]> {
-  const items = await tauriCommand<
-    Array<{
-      codigo: string;
-      produtoNome: string;
-      categoriaNome: string;
-      estoqueAtual: number;
-      estoqueMinimo: number;
-      statusEstoque: "NORMAL" | "BAIXO" | "ZERADO";
-      ativo: boolean;
-    }>
-  >("report_current_stock", {
-    filters: {
-      query: filters.query,
-      categoriaId: filters.categoriaId,
-      ativo: filters.ativo
-    }
-  });
-
-  return items.map((item) => ({
-    codigo: item.codigo,
-    produto_nome: item.produtoNome,
-    categoria_nome: item.categoriaNome,
-    estoque_atual: item.estoqueAtual,
-    estoque_minimo: item.estoqueMinimo,
-    status_estoque: item.statusEstoque,
-    ativo: item.ativo
-  }));
+export async function reportEstoqueAtualRepository(): Promise<RelatorioEstoqueItem[]> {
+  try {
+    const items = await listarRelatorioProdutos();
+    return items.map((item: any) => ({
+      codigo: item.id.toString(),
+      produto_nome: item.nome,
+      categoria_nome: "",
+      estoque_atual: item.quantidade,
+      estoque_minimo: 0,
+      status_estoque: item.quantidade <= 0 ? "ZERADO" : "NORMAL",
+      ativo: item.ativo
+    }));
+  } catch {
+    return [];
+  }
 }
 
-export async function reportEstoqueBaixoRepository(
-  filters: RelatorioEstoqueBaixoFilters
-): Promise<RelatorioEstoqueBaixoItem[]> {
-  const items = await tauriCommand<
-    Array<{
-      codigo: string;
-      produtoNome: string;
-      categoriaNome: string;
-      estoqueAtual: number;
-      estoqueMinimo: number;
-      diferencaReposicao: number;
-      statusEstoque: "BAIXO" | "ZERADO";
-    }>
-  >("report_low_stock", {
-    filters: {
-      query: filters.query,
-      categoriaId: filters.categoriaId
-    }
-  });
-
-  return items.map((item) => ({
-    codigo: item.codigo,
-    produto_nome: item.produtoNome,
-    categoria_nome: item.categoriaNome,
-    estoque_atual: item.estoqueAtual,
-    estoque_minimo: item.estoqueMinimo,
-    diferenca_reposicao: item.diferencaReposicao,
-    status_estoque: item.statusEstoque
-  }));
+export async function reportEstoqueBaixoRepository(): Promise<RelatorioEstoqueBaixoItem[]> {
+  try {
+    const items = await listarRelatorioProdutos();
+    return items
+      .filter((item: any) => item.quantidade <= 0)
+      .map((item: any) => ({
+        codigo: item.id.toString(),
+        produto_nome: item.nome,
+        categoria_nome: "",
+        estoque_atual: item.quantidade,
+        estoque_minimo: 0,
+        diferenca_reposicao: Math.abs(item.quantidade),
+        status_estoque: item.quantidade <= 0 ? "ZERADO" : "BAIXO"
+      }));
+  } catch {
+    return [];
+  }
 }

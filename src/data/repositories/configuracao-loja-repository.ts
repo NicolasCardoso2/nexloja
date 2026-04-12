@@ -1,53 +1,48 @@
-﻿import { tauriCommand } from "@/data/db/tauri-command";
+﻿import { obterConfiguracaoLoja, atualizarConfiguracaoLoja } from "@/services/api";
 import { ConfiguracaoLojaEntity, UpsertConfiguracaoLojaInput } from "@/domain/entities/configuracao-loja";
 
-type ConfiguracaoLojaRaw = {
-  id: number;
-  nomeLoja: string;
-  cnpj?: string | null;
-  telefone?: string | null;
-  email?: string | null;
-  endereco?: string | null;
-  logoPath?: string | null;
-  tema: "light" | "dark";
-  moeda: string;
-};
-
-function fromRaw(raw: ConfiguracaoLojaRaw): ConfiguracaoLojaEntity {
+function fromRaw(raw: any): ConfiguracaoLojaEntity {
   return {
     id: raw.id,
-    nome_loja: raw.nomeLoja,
+    nome_loja: raw.nome_loja,
     cnpj: raw.cnpj,
     telefone: raw.telefone,
     email: raw.email,
     endereco: raw.endereco,
-    logo_path: raw.logoPath,
-    tema: raw.tema,
-    moeda: raw.moeda
-  };
-}
-
-function toPayload(input: UpsertConfiguracaoLojaInput) {
-  return {
-    nomeLoja: input.nome_loja,
-    cnpj: input.cnpj,
-    telefone: input.telefone,
-    email: input.email,
-    endereco: input.endereco,
-    logoPath: input.logo_path,
-    tema: input.tema,
-    moeda: input.moeda
+    logo_path: "",
+    tema: "light",
+    moeda: "BRL"
   };
 }
 
 export async function getConfiguracaoLojaRepository(): Promise<ConfiguracaoLojaEntity> {
-  const raw = await tauriCommand<ConfiguracaoLojaRaw>("get_store_configuration");
-  return fromRaw(raw);
+  try {
+    const raw = await obterConfiguracaoLoja();
+    return fromRaw(raw);
+  } catch {
+    return {
+      id: 1,
+      nome_loja: "Loja NexLoja",
+      cnpj: "",
+      telefone: "",
+      email: "",
+      endereco: "",
+      logo_path: "",
+      tema: "light",
+      moeda: "BRL"
+    };
+  }
 }
 
 export async function updateConfiguracaoLojaRepository(
   payload: UpsertConfiguracaoLojaInput
 ): Promise<ConfiguracaoLojaEntity> {
-  const raw = await tauriCommand<ConfiguracaoLojaRaw>("update_store_configuration", { payload: toPayload(payload) });
+  const raw = await atualizarConfiguracaoLoja({
+    nome_loja: payload.nome_loja,
+    cnpj: payload.cnpj,
+    telefone: payload.telefone,
+    email: payload.email,
+    endereco: payload.endereco
+  });
   return fromRaw(raw);
 }

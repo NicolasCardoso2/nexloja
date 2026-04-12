@@ -1,28 +1,92 @@
 ﻿import {
   createClienteRepository,
-  deactivateClienteRepository,
   getClienteByIdRepository,
   listClientesRepository,
   updateClienteRepository
 } from "@/data/repositories/cliente-repository";
-import { ClienteFilters, UpsertClienteInput } from "@/domain/entities/cliente";
+import { ClienteListItemEntity, ClienteDetalheEntity, UpsertClienteInput } from "@/domain/entities/cliente";
+import { DadosInvalidosError } from "@/domain/errors/domain-error";
 
-export function listClientesService(filters: ClienteFilters) {
-  return listClientesRepository(filters);
+/**
+ * Service para listar clientes
+ * Aplica regras de negócio e orquestra operações
+ */
+export async function listClientesService(): Promise<ClienteListItemEntity[]> {
+  return await listClientesRepository();
 }
 
-export function getClienteByIdService(id: number) {
-  return getClienteByIdRepository(id);
+/**
+ * Service para obter cliente por ID
+ * Valida existência e aplica regras
+ */
+export async function getClienteByIdService(id: number): Promise<ClienteDetalheEntity> {
+  return await getClienteByIdRepository(id);
 }
 
-export function createClienteService(payload: UpsertClienteInput) {
-  return createClienteRepository(payload);
+/**
+ * Service para criar um novo cliente
+ * Valida regras de negócio antes de persistir
+ * - Validação de campos obrigatórios
+ * - Validação de CPF (se fornecido)
+ * - Validação de email (se fornecido)
+ */
+export async function createClienteService(payload: UpsertClienteInput): Promise<number> {
+  // Validar campo obrigatório: nome
+  if (!payload.nome || payload.nome.trim().length === 0) {
+    throw new DadosInvalidosError('nome', 'Nome é obrigatório');
+  }
+
+  // Validar CPF se fornecido
+  if (payload.cpf && !isValidCPF(payload.cpf)) {
+    throw new DadosInvalidosError('cpf', 'CPF inválido');
+  }
+
+  // Validar email se fornecido
+  if (payload.email && !isValidEmail(payload.email)) {
+    throw new DadosInvalidosError('email', 'Email inválido');
+  }
+
+  // Persistir no repositório
+  return await createClienteRepository(payload);
 }
 
-export function updateClienteService(id: number, payload: UpsertClienteInput) {
-  return updateClienteRepository(id, payload);
+/**
+ * Service para atualizar um cliente
+ * Valida regras antes de persistir
+ */
+export async function updateClienteService(id: number, payload: UpsertClienteInput): Promise<void> {
+  // Validar campo obrigatório: nome
+  if (!payload.nome || payload.nome.trim().length === 0) {
+    throw new DadosInvalidosError('nome', 'Nome é obrigatório');
+  }
+
+  // Validar CPF se fornecido
+  if (payload.cpf && !isValidCPF(payload.cpf)) {
+    throw new DadosInvalidosError('cpf', 'CPF inválido');
+  }
+
+  // Validar email se fornecido
+  if (payload.email && !isValidEmail(payload.email)) {
+    throw new DadosInvalidosError('email', 'Email inválido');
+  }
+
+  // Persistir no repositório
+  return await updateClienteRepository(id, payload);
 }
 
-export function deactivateClienteService(id: number) {
-  return deactivateClienteRepository(id);
+/**
+ * Valida formato de CPF (simplificado)
+ * Em produção, usar lib como 'cpf-validator'
+ */
+function isValidCPF(cpf: string): boolean {
+  const cleanCPF = cpf.replace(/\D/g, '');
+  return cleanCPF.length === 11 && /^\d+$/.test(cleanCPF);
+}
+
+/**
+ * Valida formato de email
+ */
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }

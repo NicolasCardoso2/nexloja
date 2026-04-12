@@ -19,7 +19,7 @@ export function DashboardPage(): JSX.Element {
 
   const dashboardQuery = useQuery({
     queryKey: dashboardQueryKeys.resumo(usuario?.id ?? 0),
-    queryFn: () => getDashboardResumoService(usuario!.id),
+    queryFn: () => getDashboardResumoService(),
     enabled: Boolean(usuario)
   });
 

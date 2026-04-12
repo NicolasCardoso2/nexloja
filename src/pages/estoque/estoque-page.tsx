@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react";
+﻿import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { appRoutes } from "@/app/constants/routes";
@@ -13,9 +13,7 @@ import {
 } from "@/features/estoque/services/estoque-service";
 import {
   EstoqueListState,
-  serializeEstoqueState,
-  toEstoqueFilters,
-  toMovimentacaoFilters
+  serializeEstoqueState
 } from "@/features/estoque/types/estoque-filters";
 import { listCategoriasService } from "@/features/produtos/services/categoria-service";
 import { Button } from "@/shared/components/button";
@@ -33,9 +31,6 @@ export function EstoquePage(): JSX.Element {
   const navigate = useNavigate();
   const [filtersState, setFiltersState] = useState<EstoqueListState>(defaultFilters);
 
-  const estoqueFilters = useMemo(() => toEstoqueFilters(filtersState), [filtersState]);
-  const movimentacaoFilters = useMemo(() => toMovimentacaoFilters(filtersState), [filtersState]);
-
   const categoriasQuery = useQuery({
     queryKey: ["categorias", "estoque"],
     queryFn: listCategoriasService
@@ -48,12 +43,12 @@ export function EstoquePage(): JSX.Element {
 
   const estoqueQuery = useQuery({
     queryKey: estoqueQueryKeys.list(serializeEstoqueState(filtersState)),
-    queryFn: () => listEstoqueService(estoqueFilters)
+    queryFn: () => listEstoqueService(),
   });
 
   const movimentacoesQuery = useQuery({
-    queryKey: estoqueQueryKeys.movimentacoes(JSON.stringify(movimentacaoFilters)),
-    queryFn: () => listMovimentacoesEstoqueService(movimentacaoFilters)
+    queryKey: estoqueQueryKeys.movimentacoes(JSON.stringify(filtersState)),
+    queryFn: () => listMovimentacoesEstoqueService(),
   });
 
   return (

@@ -1,8 +1,8 @@
-﻿import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+﻿import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { appRoutes } from "@/app/constants/routes";
 import { produtoQueryKeys } from "@/features/produtos/services/produto-query-keys";
-import { deactivateProdutoService, getProdutoByIdService } from "@/features/produtos/services/produto-service";
+import { getProdutoByIdService } from "@/features/produtos/services/produto-service";
 import { ProdutoStatusBadge } from "@/features/produtos/components/produto-status-badge";
 import { Button } from "@/shared/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/card";
@@ -20,30 +20,11 @@ export function ProdutoDetalhePage(): JSX.Element {
   const { id } = useParams();
   const productId = Number(id);
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
   const produtoQuery = useQuery({
     queryKey: produtoQueryKeys.detail(productId),
     queryFn: () => getProdutoByIdService(productId),
     enabled: Number.isFinite(productId)
   });
-
-  const inativarMutation = useMutation({
-    mutationFn: deactivateProdutoService,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: produtoQueryKeys.all });
-      await queryClient.invalidateQueries({ queryKey: produtoQueryKeys.detail(productId) });
-    }
-  });
-
-  function handleInativar(): void {
-    const confirmed = window.confirm("Confirma a inativacao deste produto?");
-    if (!confirmed) {
-      return;
-    }
-
-    inativarMutation.mutate(productId);
-  }
 
   if (produtoQuery.isLoading) {
     return (
@@ -75,9 +56,6 @@ export function ProdutoDetalhePage(): JSX.Element {
             </Button>
             <Button variant="outline" onClick={() => navigate(detailPath(appRoutes.produtoEditar, produto.id))}>
               Editar
-            </Button>
-            <Button variant="destructive" disabled={!produto.ativo || inativarMutation.isPending} onClick={handleInativar}>
-              Inativar
             </Button>
           </div>
         }

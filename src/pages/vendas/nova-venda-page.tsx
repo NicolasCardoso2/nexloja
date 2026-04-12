@@ -49,7 +49,7 @@ export function NovaVendaPage(): JSX.Element {
 
   const caixaAtualQuery = useQuery({
     queryKey: caixaQueryKeys.sessaoAtual(usuario?.id ?? 0),
-    queryFn: () => getCaixaAtualService(usuario!.id),
+    queryFn: () => getCaixaAtualService(),
     enabled: Boolean(usuario)
   });
 
@@ -61,7 +61,7 @@ export function NovaVendaPage(): JSX.Element {
 
   const clientesQuery = useQuery({
     queryKey: ["clientes", "venda"],
-    queryFn: () => listClientesService({ ativo: true })
+    queryFn: () => listClientesService()
   });
 
   const finalizarVendaMutation = useMutation({

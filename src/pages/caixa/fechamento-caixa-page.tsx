@@ -20,7 +20,7 @@ export function FechamentoCaixaPage(): JSX.Element {
 
   const sessaoAtualQuery = useQuery({
     queryKey: caixaQueryKeys.sessaoAtual(usuario?.id ?? 0),
-    queryFn: () => getCaixaAtualService(usuario!.id),
+    queryFn: () => getCaixaAtualService(),
     enabled: Boolean(usuario)
   });
 

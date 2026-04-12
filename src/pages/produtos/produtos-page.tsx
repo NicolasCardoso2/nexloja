@@ -1,11 +1,11 @@
-﻿import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+﻿import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { appRoutes } from "@/app/constants/routes";
 import { listCategoriasService } from "@/features/produtos/services/categoria-service";
 import { produtoQueryKeys } from "@/features/produtos/services/produto-query-keys";
-import { deactivateProdutoService, listProdutosService } from "@/features/produtos/services/produto-service";
-import { ProdutoListState, serializeProdutoFilters, toProdutoFilters } from "@/features/produtos/types/produto-filters";
+import { listProdutosService } from "@/features/produtos/services/produto-service";
+import { ProdutoListState, serializeProdutoFilters } from "@/features/produtos/types/produto-filters";
 import { ProdutosFilters } from "@/features/produtos/components/produtos-filters";
 import { ProdutosTable } from "@/features/produtos/components/produtos-table";
 import { Button } from "@/shared/components/button";
@@ -24,35 +24,21 @@ function productPath(routeTemplate: string, id: number): string {
 
 export function ProdutosPage(): JSX.Element {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [filtersState, setFiltersState] = useState<ProdutoListState>(defaultFilters);
-  const filters = useMemo(() => toProdutoFilters(filtersState), [filtersState]);
+
+  const serializedFilters = useMemo(() => serializeProdutoFilters(filtersState), [filtersState]);
 
   const categoriasQuery = useQuery({
     queryKey: produtoQueryKeys.categorias,
-    queryFn: listCategoriasService
+    queryFn: listCategoriasService,
+    staleTime: 5 * 60 * 1000
   });
 
   const produtosQuery = useQuery({
-    queryKey: produtoQueryKeys.list(serializeProdutoFilters(filtersState)),
-    queryFn: () => listProdutosService(filters)
+    queryKey: produtoQueryKeys.list(serializedFilters),
+    queryFn: () => listProdutosService(),
+    staleTime: 5 * 60 * 1000
   });
-
-  const inativarMutation = useMutation({
-    mutationFn: deactivateProdutoService,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: produtoQueryKeys.all });
-    }
-  });
-
-  function handleInativar(id: number): void {
-    const confirmed = window.confirm("Confirma a inativacao deste produto?");
-    if (!confirmed) {
-      return;
-    }
-
-    inativarMutation.mutate(id);
-  }
 
   return (
     <section className="space-y-4">
@@ -90,10 +76,10 @@ export function ProdutosPage(): JSX.Element {
       {produtosQuery.data && produtosQuery.data.length > 0 ? (
         <ProdutosTable
           produtos={produtosQuery.data}
-          isInativando={inativarMutation.isPending}
+          isInativando={false}
           onVisualizar={(id) => navigate(productPath(appRoutes.produtoDetalhe, id))}
           onEditar={(id) => navigate(productPath(appRoutes.produtoEditar, id))}
-          onInativar={handleInativar}
+          onInativar={() => {}}
         />
       ) : null}
     </section>

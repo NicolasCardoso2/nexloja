@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react";
+﻿import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listClientesService } from "@/features/clientes/services/cliente-service";
 import { listCategoriasService } from "@/features/produtos/services/categoria-service";
@@ -46,68 +46,49 @@ export function RelatoriosPage(): JSX.Element {
     categoriaId: null as number | null
   });
 
+  const vendassKey = useMemo(() => JSON.stringify(filtrosVendas), [filtrosVendas]);
+  const maisVendidosKey = useMemo(() => JSON.stringify(filtrosMaisVendidos), [filtrosMaisVendidos]);
+  const estoqueAtualKey = useMemo(() => JSON.stringify(filtrosEstoqueAtual), [filtrosEstoqueAtual]);
+  const estoqueBaixoKey = useMemo(() => JSON.stringify(filtrosEstoqueBaixo), [filtrosEstoqueBaixo]);
+
   const clientesQuery = useQuery({
     queryKey: ["clientes", "relatorios"],
-    queryFn: () => listClientesService({})
+    queryFn: () => listClientesService(),
+    staleTime: 5 * 60 * 1000
   });
 
   const categoriasQuery = useQuery({
     queryKey: ["categorias", "relatorios"],
-    queryFn: listCategoriasService
+    queryFn: listCategoriasService,
+    staleTime: 5 * 60 * 1000
   });
 
   const vendasQuery = useQuery({
-    queryKey: relatoriosQueryKeys.vendas(JSON.stringify(filtrosVendas)),
-    queryFn: () =>
-      reportVendasPorPeriodoService({
-        dataInicio: filtrosVendas.dataInicio || undefined,
-        dataFim: filtrosVendas.dataFim || undefined,
-        clienteId: filtrosVendas.clienteId ?? undefined,
-        status: filtrosVendas.status || undefined,
-        formaPagamento: filtrosVendas.formaPagamento || undefined
-      }),
-    enabled: activeTab === "VENDAS"
+    queryKey: relatoriosQueryKeys.vendas(vendassKey),
+    queryFn: () => reportVendasPorPeriodoService(),
+    enabled: activeTab === "VENDAS",
+    staleTime: 5 * 60 * 1000
   });
 
   const maisVendidosQuery = useQuery({
-    queryKey: relatoriosQueryKeys.produtosMaisVendidos(JSON.stringify(filtrosMaisVendidos)),
-    queryFn: () =>
-      reportProdutosMaisVendidosService({
-        dataInicio: filtrosMaisVendidos.dataInicio || undefined,
-        dataFim: filtrosMaisVendidos.dataFim || undefined,
-        categoriaId: filtrosMaisVendidos.categoriaId ?? undefined
-      }),
-    enabled: activeTab === "MAIS_VENDIDOS"
+    queryKey: relatoriosQueryKeys.produtosMaisVendidos(maisVendidosKey),
+    queryFn: () => reportProdutosMaisVendidosService(),
+    enabled: activeTab === "MAIS_VENDIDOS",
+    staleTime: 5 * 60 * 1000
   });
 
-  const estoqueAtualFilters = useMemo(
-    () => ({
-      query: filtrosEstoqueAtual.query || undefined,
-      categoriaId: filtrosEstoqueAtual.categoriaId ?? undefined,
-      ativo:
-        filtrosEstoqueAtual.ativo === "TODOS"
-          ? undefined
-          : filtrosEstoqueAtual.ativo === "ATIVO"
-            ? true
-            : false
-    }),
-    [filtrosEstoqueAtual]
-  );
-
   const estoqueAtualQuery = useQuery({
-    queryKey: relatoriosQueryKeys.estoqueAtual(JSON.stringify(filtrosEstoqueAtual)),
-    queryFn: () => reportEstoqueAtualService(estoqueAtualFilters),
-    enabled: activeTab === "ESTOQUE_ATUAL"
+    queryKey: relatoriosQueryKeys.estoqueAtual(estoqueAtualKey),
+    queryFn: () => reportEstoqueAtualService(),
+    enabled: activeTab === "ESTOQUE_ATUAL",
+    staleTime: 5 * 60 * 1000
   });
 
   const estoqueBaixoQuery = useQuery({
-    queryKey: relatoriosQueryKeys.estoqueBaixo(JSON.stringify(filtrosEstoqueBaixo)),
-    queryFn: () =>
-      reportEstoqueBaixoService({
-        query: filtrosEstoqueBaixo.query || undefined,
-        categoriaId: filtrosEstoqueBaixo.categoriaId ?? undefined
-      }),
-    enabled: activeTab === "ESTOQUE_BAIXO"
+    queryKey: relatoriosQueryKeys.estoqueBaixo(estoqueBaixoKey),
+    queryFn: () => reportEstoqueBaixoService(),
+    enabled: activeTab === "ESTOQUE_BAIXO",
+    staleTime: 5 * 60 * 1000
   });
 
   function renderActiveSection(): JSX.Element {

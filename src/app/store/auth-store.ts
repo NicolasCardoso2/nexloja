@@ -5,6 +5,7 @@ import { AuthState, UsuarioSessao } from "@/features/auth/types/auth-types";
 type PersistedAuth = {
   usuario: UsuarioSessao | null;
   token: string | null;
+  estaAutenticado: boolean;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -30,15 +31,9 @@ export const useAuthStore = create<AuthState>()(
       name: "nexloja-auth",
       partialize: (state): PersistedAuth => ({
         usuario: state.usuario,
-        token: state.token
-      }),
-      onRehydrateStorage: () => (state) => {
-        if (!state) {
-          return;
-        }
-
-        state.estaAutenticado = Boolean(state.usuario && state.token);
-      }
+        token: state.token,
+        estaAutenticado: state.estaAutenticado
+      })
     }
   )
 );

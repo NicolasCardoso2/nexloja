@@ -1,6 +1,6 @@
-﻿import { tauriCommand } from "@/data/db/tauri-command";
+﻿import { listarCategorias as apiListarCategorias } from "@/services/api";
 import { CategoriaEntity } from "@/domain/entities/produto";
 
 export async function listCategoriasRepository(): Promise<CategoriaEntity[]> {
-  return tauriCommand<CategoriaEntity[]>("list_categories");
+  return apiListarCategorias();
 }

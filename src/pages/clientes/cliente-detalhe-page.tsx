@@ -1,9 +1,9 @@
-﻿import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+﻿import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { appRoutes } from "@/app/constants/routes";
 import { ClienteStatusBadge } from "@/features/clientes/components/cliente-status-badge";
 import { clienteQueryKeys } from "@/features/clientes/services/cliente-query-keys";
-import { deactivateClienteService, getClienteByIdService } from "@/features/clientes/services/cliente-service";
+import { getClienteByIdService } from "@/features/clientes/services/cliente-service";
 import { Button } from "@/shared/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/card";
 import { PageTitle } from "@/shared/components/page-title";
@@ -20,30 +20,11 @@ export function ClienteDetalhePage(): JSX.Element {
   const { id } = useParams();
   const clientId = Number(id);
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
   const clienteQuery = useQuery({
     queryKey: clienteQueryKeys.detail(clientId),
     queryFn: () => getClienteByIdService(clientId),
     enabled: Number.isFinite(clientId)
   });
-
-  const inativarMutation = useMutation({
-    mutationFn: deactivateClienteService,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: clienteQueryKeys.all });
-      await queryClient.invalidateQueries({ queryKey: clienteQueryKeys.detail(clientId) });
-    }
-  });
-
-  function handleInativar(): void {
-    const confirmed = window.confirm("Confirma a inativacao deste cliente?");
-    if (!confirmed) {
-      return;
-    }
-
-    inativarMutation.mutate(clientId);
-  }
 
   if (clienteQuery.isLoading) {
     return (
@@ -76,9 +57,7 @@ export function ClienteDetalhePage(): JSX.Element {
             <Button variant="outline" onClick={() => navigate(detailPath(appRoutes.clienteEditar, cliente.id))}>
               Editar
             </Button>
-            <Button variant="destructive" disabled={!cliente.ativo || inativarMutation.isPending} onClick={handleInativar}>
-              Inativar
-            </Button>
+
           </div>
         }
       />

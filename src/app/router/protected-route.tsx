@@ -8,10 +8,8 @@ type ProtectedRouteProps = {
 };
 
 export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps): JSX.Element {
-  const { estaAutenticado, usuario } = useAuthStore((state) => ({
-    estaAutenticado: state.estaAutenticado,
-    usuario: state.usuario
-  }));
+  const estaAutenticado = useAuthStore((state) => state.estaAutenticado);
+  const usuario = useAuthStore((state) => state.usuario);
 
   if (!estaAutenticado || !usuario) {
     return <Navigate to={appRoutes.login} replace />;

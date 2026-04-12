@@ -2,6 +2,9 @@
 # Dependencies
 # =========================
 node_modules/
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
 
 # =========================
 # Frontend build/cache
@@ -10,7 +13,10 @@ dist/
 dist-ssr/
 .vite/
 coverage/
+.coverage/
 *.tsbuildinfo
+out/
+build/
 
 # =========================
 # Environment / local config
@@ -18,6 +24,7 @@ coverage/
 .env
 .env.*
 !.env.example
+!.env.local.example
 *.local
 
 # =========================
@@ -28,22 +35,49 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
+
+# =========================
+# Testing
+# =========================
+.vitest/
+coverage/
+.coverage/
+junit.xml
+test-results/
 
 # =========================
 # Editors / IDE
 # =========================
 .vscode/
 .idea/
+.cursor/
+.cursorignore
 *.swp
 *.swo
 *~
+*.sublime-workspace
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-project
 
 # =========================
 # OS files
 # =========================
 .DS_Store
+.DS_Store?
+._*
+._.DS_Store
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 Desktop.ini
+*.lnk
+$RECYCLE.BIN/
 
 # =========================
 # Rust / Tauri artifacts
@@ -67,3 +101,28 @@ src-tauri/gen/
 tmp/
 temp/
 *.tmp
+.tmp/
+*.bak
+*.swp
+
+# =========================
+# IDE specific files
+# =========================
+.eslintcache
+.prettierignore
+.prettierrc.json.cache
+.cache/
+
+# =========================
+# Build tool cache
+# =========================
+.turbo/
+.grunt/
+bower_components/
+
+# =========================
+# Development tools
+# =========================
+.husky/
+.pnp
+.pnp.js

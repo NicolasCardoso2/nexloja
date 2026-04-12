@@ -1,4 +1,4 @@
-﻿import { useEffect } from "react";
+﻿import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/card";
 import { appRoutes } from "@/app/constants/routes";
@@ -10,6 +10,7 @@ import { useAuthStore } from "@/app/store/auth-store";
 
 export function LoginPage(): JSX.Element {
   const navigate = useNavigate();
+  const navigateRef = useRef(navigate);
   const entrar = useAuthStore((state) => state.entrar);
   const estaAutenticado = useAuthStore((state) => state.estaAutenticado);
   const loginMutation = useLoginMutation();
@@ -20,14 +21,13 @@ export function LoginPage(): JSX.Element {
 
   useEffect(() => {
     if (estaAutenticado) {
-      navigate(appRoutes.dashboard, { replace: true });
+      navigateRef.current(appRoutes.dashboard, { replace: true });
     }
-  }, [estaAutenticado, navigate]);
+  }, [estaAutenticado]);
 
   async function handleLogin(values: LoginSchema): Promise<void> {
     const response = await loginMutation.mutateAsync(values);
     entrar(response.usuario, response.token);
-    navigate(appRoutes.dashboard, { replace: true });
   }
 
   const message = loginMutation.isError ? "Falha ao autenticar. Verifique login e senha." : undefined;
