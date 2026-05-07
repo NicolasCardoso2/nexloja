@@ -2,21 +2,35 @@
 # Dependencies
 # =========================
 node_modules/
-pnpm-lock.yaml
-yarn.lock
-package-lock.json
+bower_components/
 
 # =========================
-# Frontend build/cache
+# Build output / bundles
 # =========================
 dist/
 dist-ssr/
-.vite/
-coverage/
-.coverage/
-*.tsbuildinfo
 out/
 build/
+release/
+*.tsbuildinfo
+
+# =========================
+# Tool caches
+# =========================
+.vite/
+.vitest/
+.cache/
+.turbo/
+.grunt/
+.eslintcache
+
+# =========================
+# Coverage / test artifacts
+# =========================
+coverage/
+.coverage/
+junit.xml
+test-results/
 
 # =========================
 # Environment / local config
@@ -38,13 +52,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # =========================
-# Testing
+# Lockfiles
 # =========================
-.vitest/
-coverage/
-.coverage/
-junit.xml
-test-results/
+# Recomendado versionar lockfile para builds reproduzíveis.
 
 # =========================
 # Editors / IDE
@@ -57,12 +67,12 @@ test-results/
 *.swo
 *~
 *.sublime-workspace
+*.sublime-project
 .project
 .classpath
 .c9/
 *.launch
 .settings/
-*.sublime-project
 
 # =========================
 # OS files
@@ -70,7 +80,6 @@ test-results/
 .DS_Store
 .DS_Store?
 ._*
-._.DS_Store
 .Spotlight-V100
 .Trashes
 ehthumbs.db
@@ -78,13 +87,6 @@ Thumbs.db
 Desktop.ini
 *.lnk
 $RECYCLE.BIN/
-
-# =========================
-# Rust / Tauri artifacts
-# =========================
-src-tauri/target/
-src-tauri/.cargo/
-src-tauri/gen/
 
 # =========================
 # Local database files (SQLite)
@@ -100,25 +102,22 @@ src-tauri/gen/
 # =========================
 tmp/
 temp/
-*.tmp
 .tmp/
+*.tmp
 *.bak
-*.swp
 
 # =========================
-# IDE specific files
+# Electron / Desktop
 # =========================
-.eslintcache
-.prettierignore
-.prettierrc.json.cache
-.cache/
+front/release/
+front/dist/
 
 # =========================
-# Build tool cache
+# Rust / Tauri artifacts (caso use no futuro)
 # =========================
-.turbo/
-.grunt/
-bower_components/
+src-tauri/target/
+src-tauri/.cargo/
+src-tauri/gen/
 
 # =========================
 # Development tools

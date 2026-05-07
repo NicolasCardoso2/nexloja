@@ -2,17 +2,42 @@
 
 # NexLoja
 
-**Sistema completo de gerenciamento de loja — desktop, offline, produção-ready.**
+**ERP simples para mercadinho de bairro — rápido, offline e fácil de usar.**
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React_18-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-[![Tauri](https://img.shields.io/badge/Tauri_2-FFC131?style=flat-square&logo=tauri&logoColor=black)](https://tauri.app/)
+[![Electron](https://img.shields.io/badge/Electron-47848F?style=flat-square&logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white)](https://sqlite.org/)
 
-> Aplicativo desktop para gerenciamento completo de loja física — estoque, caixa, vendas e relatórios — construído com Tauri + React + TypeScript e persistência local em SQLite.
+> ERP desktop focado em mercadinho de bairro para controlar caixa, estoque e lucro em 5 minutos por dia, com operação offline e persistência local em SQLite.
 
-<!-- 💡 Adicione um screenshot aqui: -->
-<!-- ![NexLoja Dashboard](./docs/screenshot-dashboard.png) -->
+**Posicionamento do produto**
+
+- Nicho principal: **mercadinho de bairro**
+- Público: dono(a), gerente e operador de caixa sem perfil técnico
+- Promessa: **controle caixa, estoque e lucro em 5 minutos por dia**
+
+## Screenshots
+
+### Login
+Tela de autenticação com acesso por perfil de usuário.
+
+![Login](./docs/images/screenshots/login.png)
+
+### Dashboard
+Visão rápida dos indicadores principais para acompanhar a operação diária.
+
+![Dashboard](./docs/images/screenshots/dashboard.png)
+
+### Nova venda
+Fluxo de lançamento de venda com cálculo automático de subtotal, desconto e total.
+
+![Nova Venda](./docs/images/screenshots/nova-venda.png)
+
+### Relatórios
+Análises de vendas, produtos e estoque para tomada de decisão.
+
+![Relatórios](./docs/images/screenshots/relatorios.png)
 
 </div>
 
@@ -22,13 +47,13 @@
 
 | Módulo | Funcionalidades |
 |---|---|
-| 🔐 **Autenticação** | Perfis ADMIN e VENDEDOR com senhas em Argon2 |
+| 🔐 **Autenticação** | Perfis ADMIN e VENDEDOR com JWT e bcrypt |
 | 📊 **Dashboard** | Indicadores operacionais em tempo real |
 | 📦 **Produtos** | CRUD completo + inativação lógica + controle de estoque |
 | 👥 **Clientes** | Cadastro completo com histórico de compras |
 | 💰 **Caixa** | Abertura, sessão ativa, fechamento e movimentos |
 | 🛒 **Vendas** | Nova venda, histórico, detalhes e cancelamento |
-| 📈 **Relatórios** | Vendas por período, mais vendidos, estoque atual e crítico |
+| 📈 **Relatórios** | Lucro real, curva ABC, reposição inteligente, sazonalidade e saúde do negócio |
 
 ---
 
@@ -97,8 +122,6 @@ npm run test:coverage
 - Services com validação — 37 testes
 - **Total: 114 testes · 97% cobertura**
 
-Veja [TESTING_GUIDE.md](./TESTING_GUIDE.md) para documentação completa.
-
 ---
 
 ## Regras de negócio principais
@@ -117,7 +140,7 @@ Veja [TESTING_GUIDE.md](./TESTING_GUIDE.md) para documentação completa.
 
 **Testing:** Vitest 1.1 · @testing-library/react · jsdom · 114 testes unitários
 
-**Backend (desktop):** Tauri 2 · Rust · rusqlite · Argon2
+**Desktop:** Electron · Node.js · Express · JWT · bcryptjs
 
 **Banco de dados:** SQLite (10 tabelas — usuários, produtos, clientes, vendas, estoque, caixa e mais)
 
@@ -125,23 +148,31 @@ Veja [TESTING_GUIDE.md](./TESTING_GUIDE.md) para documentação completa.
 
 ## Como rodar localmente
 
-**Pré-requisitos:** Node.js 20+, npm, Rust toolchain estável, dependências nativas Tauri (Windows: WebView2 + Build Tools)
+**Pré-requisitos:** Node.js 20+, npm
 
 ```bash
-# Instalar dependências (incluindo Vitest)
-npm install
+# Instalar dependências do frontend e backend
+cd front && npm install
+cd ../backend && npm install
 
 # Rodar todos os testes
-npm run test
+cd front && npm run test
 
-# Rodar em modo desenvolvimento (desktop)
-npm run tauri dev
+# Rodar em modo desenvolvimento (navegador)
+cd front && npm run dev
+# Em outro terminal, iniciar o backend:
+node backend/src/index.js
 
-# Build para produção
-npm run tauri build
+# Rodar como app desktop (Electron)
+cd front && npm run electron:dev
+
+# Gerar instalador .exe
+cd front && npm run electron:build
 ```
 
-**Credential padrão do seed:**
+O instalador é gerado em `front/release/`.
+
+**Credencial padrão do seed:**
 ```
 login: admin
 senha: admin123
@@ -154,6 +185,25 @@ senha: admin123
 Schema com 10 tabelas criado e migrado automaticamente na inicialização:
 
 `usuarios` · `configuracao_loja` · `categorias` · `produtos` · `clientes` · `caixa_sessoes` · `vendas` · `itens_venda` · `movimentacoes_estoque` · `caixa_movimentos`
+
+---
+
+## Download (Windows)
+
+Baixe a versão instalável do app desktop (.exe) em **Releases**:
+
+**[Baixar NexLoja para Windows](https://github.com/NicolasCardoso2/nexloja/releases)**
+
+Versão atual: **0.1.3**
+
+Ao executar o instalador, ele cria atalho no Menu Iniciar e na área de trabalho.
+
+## Notas da versão 0.1.3
+
+- Correção de instância única no Electron (duplo clique não abre múltiplas janelas)
+- Correção de inicialização do backend empacotado com `ELECTRON_RUN_AS_NODE=1`
+- Ajustes de autenticação no app desktop
+- Melhorias de UX e revisão de textos em português (acentos e termos)
 
 ---
 
