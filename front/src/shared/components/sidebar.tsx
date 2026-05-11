@@ -13,7 +13,7 @@ type LinkItem = {
 };
 
 const links: LinkItem[] = [
-  { to: appRoutes.dashboard, label: "Dashboard", icon: LayoutDashboard },
+  { to: appRoutes.dashboard, label: "Início", icon: LayoutDashboard },
   { to: appRoutes.produtos, label: "Produtos", icon: Package },
   { to: appRoutes.clientes, label: "Clientes", icon: Users },
   { to: appRoutes.estoque, label: "Estoque", icon: Warehouse },

@@ -25,7 +25,7 @@ export function DashboardPage(): JSX.Element {
 
   return (
     <section className="space-y-4">
-      <PageTitle title="Dashboard" description="Visao rapida do mercadinho para decidir caixa, estoque e lucro em poucos minutos." />
+      <PageTitle title="Início" description="Visao rapida do mercadinho para decidir caixa, estoque e lucro em poucos minutos." />
 
       {dashboardQuery.isLoading ? (
         <Card>

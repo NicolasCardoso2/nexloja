@@ -2,20 +2,24 @@
 
 # NexLoja
 
-**ERP simples para mercadinho de bairro — rápido, offline e fácil de usar.**
+**Sistema de gestão desktop para loja de bairro, desenvolvido sob encomenda para cliente real.**
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React_18-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![Electron](https://img.shields.io/badge/Electron-47848F?style=flat-square&logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white)](https://sqlite.org/)
 
-> ERP desktop focado em mercadinho de bairro para controlar caixa, estoque e lucro em 5 minutos por dia, com operação offline e persistência local em SQLite.
+> Sistema desktop criado para atender a rotina de uma loja cliente, com controle de caixa, estoque, vendas e indicadores essenciais mesmo sem depender de internet.
 
 **Posicionamento do produto**
 
 - Nicho principal: **mercadinho de bairro**
 - Público: dono(a), gerente e operador de caixa sem perfil técnico
 - Promessa: **controle caixa, estoque e lucro em 5 minutos por dia**
+
+## Contexto do projeto
+
+O NexLoja foi desenvolvido como **software sob encomenda para uma loja cliente**, com foco em uso real no balcão e na operação diária. A solução prioriza rapidez, clareza visual, operação offline e fluxo simples para quem precisa vender, repor estoque e fechar caixa sem complexidade.
 
 ## Screenshots
 
@@ -209,6 +213,6 @@ Ao executar o instalador, ele cria atalho no Menu Iniciar e na área de trabalho
 
 <div align="center">
 
-Feito por [Nicolas Cardoso](https://github.com/NicolasCardoso2) · [LinkedIn](https://www.linkedin.com/in/nicolas-cardoso-vilha-do-lago-2483b1322/)
+Projeto desenvolvido por [Nicolas Cardoso](https://github.com/NicolasCardoso2) sob encomenda para cliente do varejo · [LinkedIn](https://www.linkedin.com/in/nicolas-cardoso-vilha-do-lago-2483b1322/)
 
 </div>
