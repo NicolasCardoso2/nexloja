@@ -53,7 +53,7 @@ Análises de vendas, produtos e estoque para tomada de decisão.
 |---|---|
 | 🔐 **Autenticação** | Perfis ADMIN e VENDEDOR com JWT e bcrypt |
 | 📊 **Dashboard** | Indicadores operacionais em tempo real |
-| 📦 **Produtos** | CRUD completo + inativação lógica + controle de estoque |
+| 📦 **Produtos** | CRUD completo, inativação lógica e controle de estoque |
 | 👥 **Clientes** | Cadastro completo com histórico de compras |
 | 💰 **Caixa** | Abertura, sessão ativa, fechamento e movimentos |
 | 🛒 **Vendas** | Nova venda, histórico, detalhes e cancelamento |
@@ -90,18 +90,18 @@ src/
 ```
 
 **Princípios aplicados:**
-- ✅ **Lógica pesada fora das páginas** — concentrada em domain/rules e services
-- ✅ **Tipagem forte** — TypeScript strict + validação Zod em todas as entradas
-- ✅ **Regras críticas testadas** — 114 testes unitários cobrindo 97% do código
-- ✅ **Padrões SOLID** — Mappers, Error classes, Custom hooks, Use cases
+- **Lógica pesada fora das páginas**: concentrada em domain/rules e services
+- **Tipagem forte**: TypeScript strict com validação Zod em todas as entradas
+- **Regras críticas testadas**: 114 testes unitários cobrindo 97% do código
+- **Padrões SOLID**: Mappers, Error classes, Custom hooks, Use cases
 
 **Padrões implementados:**
-- ✅ **Mappers** — Transformação centralizadas API ↔ Domain (4 mappers, zero duplicação)
-- ✅ **Domain Errors** — Hierarquia de erros específicos com type guards e status HTTP
-- ✅ **Custom Hooks** — React Query encapsulado por feature (13 hooks, cache gerenciado)
-- ✅ **Services** — Orquestração de regras de negócio antes de persistência
-- ✅ **Use Cases** — Padrão para lógica complexa multi-repositório com DI
-- ✅ **Unit Tests** — 114 testes com Vitest (97% cobertura domain/rules)
+- **Mappers**: Transformação centralizada API ↔ Domain (4 mappers, zero duplicação)
+- **Domain Errors**: Hierarquia de erros específicos com type guards e status HTTP
+- **Custom Hooks**: React Query encapsulado por feature (13 hooks, cache gerenciado)
+- **Services**: Orquestração de regras de negócio antes de persistência
+- **Use Cases**: Padrão para lógica complexa multi-repositório com DI
+- **Unit Tests**: 114 testes com Vitest (97% cobertura domain/rules)
 
 ---
 
@@ -121,10 +121,10 @@ npm run test:coverage
 ```
 
 **Cobertura:**
-- Domain rules (preço, estoque, venda) — 40 testes
-- Error handling e mappers — 37 testes
-- Services com validação — 37 testes
-- **Total: 114 testes · 97% cobertura**
+- Domain rules (preço, estoque, venda): 40 testes
+- Error handling e mappers: 37 testes
+- Services com validação: 37 testes
+- **Total: 114 testes, 97% de cobertura**
 
 ---
 
@@ -140,13 +140,13 @@ npm run test:coverage
 
 ## Stack completa
 
-**Frontend:** React 18 · TypeScript · Vite · Tailwind CSS · shadcn/ui · React Router · TanStack Query · Zustand · React Hook Form · Zod
+**Frontend:** React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui, React Router, TanStack Query, Zustand, React Hook Form e Zod
 
-**Testing:** Vitest 1.1 · @testing-library/react · jsdom · 114 testes unitários
+**Testing:** Vitest 1.1, @testing-library/react, jsdom e 114 testes unitários
 
-**Desktop:** Electron · Node.js · Express · JWT · bcryptjs
+**Desktop:** Electron, Node.js, Express, JWT e bcryptjs
 
-**Banco de dados:** SQLite (10 tabelas — usuários, produtos, clientes, vendas, estoque, caixa e mais)
+**Banco de dados:** SQLite (10 tabelas: usuários, produtos, clientes, vendas, estoque, caixa e mais)
 
 ---
 
