@@ -11,7 +11,11 @@
 
 > Sistema desktop criado para atender a rotina de uma loja cliente, com controle de caixa, estoque, vendas e indicadores essenciais mesmo sem depender de internet.
 
-**Posicionamento do produto**
+</div>
+
+---
+
+## Posicionamento do produto
 
 - Nicho principal: **mercadinho de bairro**
 - Público: dono(a), gerente e operador de caixa sem perfil técnico
@@ -21,7 +25,7 @@
 
 O NexLoja foi desenvolvido como **software sob encomenda para uma loja cliente**, com foco em uso real no balcão e na operação diária. A solução prioriza rapidez, clareza visual, operação offline e fluxo simples para quem precisa vender, repor estoque e fechar caixa sem complexidade.
 
-## Screenshots
+## Capturas de Tela
 
 ### Login
 Tela de autenticação com acesso por perfil de usuário.
@@ -42,8 +46,6 @@ Fluxo de lançamento de venda com cálculo automático de subtotal, desconto e t
 Análises de vendas, produtos e estoque para tomada de decisão.
 
 ![Relatórios](./docs/images/screenshots/relatorios.png)
-
-</div>
 
 ---
 
@@ -105,7 +107,7 @@ src/
 
 ---
 
-## 🧪 Testes
+## Testes
 
 Projeto implementa testes unitários para **regras críticas de negócio**:
 
